@@ -38,10 +38,21 @@ const App = () => {
     })
   }
 
+  useEffect(()=>{loadBlockchainData()},[])
+
     
   return (
     <div>
-        <Navbar />
+        <Navbar account={account} setAccount={setAccount} />
+
+        {events && 
+        events.map((event,key)=>{
+          return(
+            <Event event={event} />
+            
+          )
+        })
+        }
     </div>
   )
 }
