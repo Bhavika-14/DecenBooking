@@ -29,6 +29,8 @@ contract Booking is ERC721 {
 
 
     mapping(uint256=>Event) public events;
+    mapping(uint256=>uint256[]) public seatsTaken;
+    mapping(uint256=>mapping(uint256=>address)) public seats;
 
     event EventListed(
         uint256 id,
@@ -58,15 +60,27 @@ contract Booking is ERC721 {
         // Publist the event
         emit EventListed(totalEvents, _name, _maxTickets, _cost, _date, _time, _location, msg.sender);
     }
- 
 
-    /**
-    function safeMint(address to) public onlyRole(MINTER_ROLE) {
-        uint256 tokenId = _tokenIdCounter.current();
-        _tokenIdCounter.increment();
-        _safeMint(to, tokenId);
+    function mint(uint256 _id, uint256 _seat) public payable {
+        require(_id<=totalEvents,"event does not exist");
+        require(msg.value >= events[_id].cost,"less amount");
+        require(_seat<=events[_id].maxTickets,"seat does not exist");
+
+        events[_id].tickets=events[_id].tickets-1;
+        seats[_id][_seat]=msg.sender;
+        seatsTaken[_id].push(_seat);
+
+        totalSupply=totalSupply+1;
+        _safeMint(msg.sender, totalSupply);
+
     }
-     */
+
+    function getSeatsTaken(uint256 _id) public view returns(uint256[] memory){
+        return seatsTaken[_id];
+    }
+
+    
+ 
 
 }
 
